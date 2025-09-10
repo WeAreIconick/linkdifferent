@@ -1,0 +1,74 @@
+{
+    "version": 2,
+    "settings": {
+        "custom": {
+            "linkDifferent": {
+                "defaultStyle": "none",
+                "defaultColor": "#54b3d6"
+            }
+        },
+        "blocks": {
+            "core/paragraph": {
+                "custom": {
+                    "linkDifferent": {
+                        "style": "none",
+                        "color": ""
+                    }
+                }
+            }
+        }
+    },
+    "styles": {
+        "blocks": {
+            "core/paragraph": {
+                "variations": {
+                    "peace-out": {
+                        "elements": {
+                            "link": {
+                                "color": {
+                                    "text": "var(--wp--preset--color--primary)"
+                                }
+                            }
+                        }
+                    },
+                    "rainbow": {
+                        "elements": {
+                            "link": {
+                                "color": {
+                                    "text": "inherit"
+                                }
+                            }
+                        }
+                    },
+                    "hat-tip": {
+                        "elements": {
+                            "link": {
+                                "color": {
+                                    "text": "#18272F"
+                                }
+                            }
+                        }
+                    },
+                    "boing": {
+                        "elements": {
+                            "link": {
+                                "color": {
+                                    "text": "var(--wp--preset--color--primary)"
+                                }
+                            }
+                        }
+                    },
+                    "strikethrough": {
+                        "elements": {
+                            "link": {
+                                "color": {
+                                    "text": "var(--wp--preset--color--primary)"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

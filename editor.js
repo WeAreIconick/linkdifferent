@@ -3,14 +3,31 @@
     const { createHigherOrderComponent } = wp.compose;
     const { Fragment } = wp.element;
     const { InspectorControls, ColorPalette } = wp.blockEditor;
-    const { BaseControl, PanelBody, Button, ButtonGroup } = wp.components;
+    const { BaseControl, PanelBody } = wp.components;
 
-    // Add custom attributes to paragraph blocks
+    // List of container blocks that should support Link Styles
+    const supportedContainerBlocks = [
+        'core/group',
+        'core/template-part',
+        'core/post-content',
+        'core/site-content',
+        'core/query',
+        'core/post-template',
+        'core/columns',
+        'core/column',
+        'core/cover',
+        'core/media-text'
+    ];
+
+    // List of all blocks that should support Link Styles (paragraphs + containers)
+    const supportedBlocks = ['core/paragraph', ...supportedContainerBlocks];
+
+    // Add custom attributes to supported blocks
     addFilter(
         'blocks.registerBlockType',
         'link-different/add-attributes',
         function(settings, name) {
-            if (name !== 'core/paragraph') {
+            if (!supportedBlocks.includes(name)) {
                 return settings;
             }
 
@@ -34,7 +51,7 @@
     // Add Link Styles panel to inspector controls
     const withLinkStyleControls = createHigherOrderComponent(function(BlockEdit) {
         return function(props) {
-            if (props.name !== 'core/paragraph') {
+            if (!supportedBlocks.includes(props.name)) {
                 return wp.element.createElement(BlockEdit, props);
             }
 
@@ -49,10 +66,9 @@
                 else if (className.includes('is-style-hat-tip')) currentStyle = 'hat-tip';
                 else if (className.includes('is-style-boing')) currentStyle = 'boing';
                 else if (className.includes('is-style-strikethrough')) currentStyle = 'strikethrough';
-                else if (className.includes('is-style-squiggle')) currentStyle = 'squiggle';
             }
 
-            // Function to update the paragraph style
+            // Function to update the block style
             const setLinkStyle = function(style) {
                 let newClassName = className || '';
                 
@@ -62,7 +78,6 @@
                 newClassName = newClassName.replace(/\bis-style-hat-tip\b/g, '');
                 newClassName = newClassName.replace(/\bis-style-boing\b/g, '');
                 newClassName = newClassName.replace(/\bis-style-strikethrough\b/g, '');
-                newClassName = newClassName.replace(/\bis-style-squiggle\b/g, '');
                 newClassName = newClassName.trim();
                 
                 // Add new style if not 'none'
@@ -82,8 +97,7 @@
                 { value: 'rainbow', label: 'Rainbow' },
                 { value: 'hat-tip', label: 'Hat Tip' },
                 { value: 'boing', label: 'Boing' },
-                { value: 'strikethrough', label: 'Strikethrough' },
-                { value: 'squiggle', label: 'Squiggle' }
+                { value: 'strikethrough', label: 'Strikethrough' }
             ];
 
             const showColorPicker = currentStyle && currentStyle !== 'none' && currentStyle !== 'rainbow';
@@ -101,6 +115,13 @@
                 { name: 'Dark Gray', color: '#34495e' }
             ];
 
+            // Determine panel title and help text based on block type
+            const isContainer = supportedContainerBlocks.includes(props.name);
+            const panelTitle = isContainer ? 'Link Styles for Container' : 'Link Styles';
+            const helpText = isContainer ? 
+                'These link styles will apply to all paragraphs within this container that don\'t have their own link styles set.' :
+                'Choose a link style for this paragraph.';
+
             return wp.element.createElement(
                 Fragment,
                 {},
@@ -111,9 +132,21 @@
                     wp.element.createElement(
                         PanelBody,
                         { 
-                            title: 'Link Styles',
+                            title: panelTitle,
                             initialOpen: true
                         },
+                        wp.element.createElement(
+                            'p',
+                            {
+                                style: { 
+                                    fontSize: '13px', 
+                                    color: '#757575', 
+                                    marginBottom: '16px',
+                                    lineHeight: '1.4'
+                                }
+                            },
+                            helpText
+                        ),
                         wp.element.createElement(
                             'div',
                             {
@@ -189,8 +222,17 @@
     // Add inline style to blocks in editor
     const withInlineStyle = createHigherOrderComponent(function(BlockListBlock) {
         return function(props) {
-            if (props.name !== 'core/paragraph' || !props.attributes.linkDifferentColor) {
+            if (!supportedBlocks.includes(props.name)) {
                 return wp.element.createElement(BlockListBlock, props);
+            }
+            
+            const { linkDifferentColor } = props.attributes;
+            
+            let customStyle = {};
+            
+            // Always set the accent color if it exists
+            if (linkDifferentColor) {
+                customStyle['--link-different-accent-color'] = linkDifferentColor;
             }
 
             const customProps = {
@@ -199,7 +241,7 @@
                     ...props.wrapperProps,
                     style: {
                         ...(props.wrapperProps ? props.wrapperProps.style : {}),
-                        '--link-different-accent-color': props.attributes.linkDifferentColor
+                        ...customStyle
                     }
                 }
             };
@@ -220,27 +262,15 @@
         'blocks.getSaveContent.extraProps',
         'link-different/add-save-style',
         function(extraProps, blockType, attributes) {
-            if (blockType.name !== 'core/paragraph') {
+            if (!supportedBlocks.includes(blockType.name)) {
                 return extraProps;
             }
             
-            const { linkDifferentColor, className, squiggleSvg } = attributes;
+            const { linkDifferentColor } = attributes;
             let customStyle = {};
             
             if (linkDifferentColor) {
                 customStyle['--link-different-accent-color'] = linkDifferentColor;
-            }
-            
-            // If it's a squiggle style, use the stored SVG or generate one
-            if (className && className.includes('is-style-squiggle')) {
-                if (squiggleSvg) {
-                    customStyle['--squiggle-svg'] = squiggleSvg;
-                } else {
-                    const squiggleColor = linkDifferentColor || '#54b3d6';
-                    const encodedColor = squiggleColor.replace('#', '%23');
-                    const squiggleSVG = "url(\"data:image/svg+xml;charset=utf8,%3Csvg id='squiggle-link' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:ev='http://www.w3.org/2001/xml-events' viewBox='0 0 10 18'%3E%3Cstyle type='text/css'%3E.squiggle%7Banimation:shift .5s linear infinite;%7D@keyframes shift %7Bfrom %7Btransform:translateX(-10px);%7Dto %7Btransform:translateX(0);%7D%7D%3C/style%3E%3Cpath fill='none' stroke='" + encodedColor + "' stroke-width='1' class='squiggle' d='M0,17.5 c 2.5,0,2.5,-1.5,5,-1.5 s 2.5,1.5,5,1.5 c 2.5,0,2.5,-1.5,5,-1.5 s 2.5,1.5,5,1.5' /%3E%3C/svg%3E\")";
-                    customStyle['--squiggle-svg'] = squiggleSVG;
-                }
             }
 
             return {
