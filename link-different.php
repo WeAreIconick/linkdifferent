@@ -1,9 +1,10 @@
 <?php
 /**
  * Plugin Name: Link Different
- * Plugin URI: https://iconick.io/
  * Description: Transform your ordinary WordPress links into irresistible eye candy with Link Different. Add delightful hover effects to paragraph links that make visitors actually want to click them.
  * Version: 1.0.0
+ * Requires at least: 6.0
+ * Requires PHP: 7.4
  * Author: Nick Hamze
  * Author URI: https://iconick.io/
  * License: GPL v2 or later
