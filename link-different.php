@@ -31,9 +31,19 @@ function link_different_enqueue_editor_assets() {
 add_action('enqueue_block_editor_assets', 'link_different_enqueue_editor_assets');
 
 /**
- * Add frontend styles
+ * Enqueue frontend styles
  */
-function link_different_add_frontend_styles() {
+function link_different_enqueue_frontend_styles() {
+    // Register and enqueue the main stylesheet
+    wp_register_style(
+        'link-different-frontend',
+        false, // No file, inline styles only
+        array(),
+        '1.0.1'
+    );
+    wp_enqueue_style('link-different-frontend');
+    
+    // Add the CSS as inline styles
     $css = '
     /* Link Different - Peace Out Style */
     p.is-style-peace-out {
@@ -190,14 +200,23 @@ function link_different_add_frontend_styles() {
     }
     ';
     
-    echo '<style>' . wp_kses($css, array()) . '</style>';
+    wp_add_inline_style('link-different-frontend', $css);
 }
-add_action('wp_head', 'link_different_add_frontend_styles');
+add_action('wp_enqueue_scripts', 'link_different_enqueue_frontend_styles');
 
 /**
- * Add editor styles
+ * Enqueue editor styles for admin
  */
-function link_different_add_editor_styles() {
+function link_different_enqueue_editor_styles() {
+    // Register and enqueue the editor stylesheet
+    wp_register_style(
+        'link-different-editor',
+        false, // No file, inline styles only
+        array(),
+        '1.0.1'
+    );
+    wp_enqueue_style('link-different-editor');
+    
     $css = '
     /* Link Different Editor Styles - More specific selectors for both direct and container styles */
     .editor-styles-wrapper p.is-style-peace-out,
@@ -461,71 +480,20 @@ function link_different_add_editor_styles() {
     }
     ';
     
-    echo '<style id="link-different-editor-styles">' . wp_kses($css, array()) . '</style>';
+    wp_add_inline_style('link-different-editor', $css);
 }
-add_action('admin_head', 'link_different_add_editor_styles');
-add_action('admin_footer', 'link_different_add_editor_styles');
+add_action('admin_enqueue_scripts', 'link_different_enqueue_editor_styles');
 
 /**
  * Enqueue styles for Site Editor
  */
-function link_different_site_editor_styles() {
+function link_different_enqueue_site_editor_styles() {
     // Check if we're in the Site Editor
-    if (!is_admin()) {
-        return;
-    }
-    
     $current_screen = get_current_screen();
     if ($current_screen && $current_screen->id === 'site-editor') {
-        // Add the same styles for Site Editor
-        link_different_add_frontend_styles();
-        link_different_add_editor_styles();
+        // Enqueue both frontend and editor styles for Site Editor
+        link_different_enqueue_frontend_styles();
+        link_different_enqueue_editor_styles();
     }
 }
-add_action('admin_head', 'link_different_site_editor_styles');
-
-/**
- * Add styles to Site Editor iframe
- */
-function link_different_site_editor_iframe_styles() {
-    // Get the CSS content safely
-    $frontend_css = '
-    /* Link Different - Peace Out Style */
-    p.is-style-peace-out {
-        position: relative;
-    }
-    p.is-style-peace-out a {
-        position: relative;
-        color: var(--link-different-accent-color, var(--wp--preset--color--accent, var(--wp--preset--color--primary, #54b3d6)));
-        text-decoration: none;
-        transition: color .2s;
-        z-index: 1;
-    }
-    p.is-style-peace-out a::before {
-        content: " ";
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: var(--link-different-accent-color, var(--wp--preset--color--accent, var(--wp--preset--color--primary, #54b3d6)));
-        z-index: -1;
-        transform: scaleX(0);
-        transform-origin: bottom right;
-        transition: transform .3s cubic-bezier(0.76,0,0.24,1);
-        border-radius: 3px;
-    }
-    p.is-style-peace-out a:hover::before {
-        transform: scaleX(1);
-        transform-origin: bottom left;
-    }
-    p.is-style-peace-out a:hover {
-        color: var(--wp--preset--color--base, var(--wp--preset--color--background, #fff));
-    }
-    /* Additional styles would continue here... */
-    ';
-    
-    echo '<style>' . wp_kses($frontend_css, array()) . '</style>';
-}
-add_action('admin_print_styles-site-editor', 'link_different_site_editor_iframe_styles');
+add_action('admin_enqueue_scripts', 'link_different_enqueue_site_editor_styles');
