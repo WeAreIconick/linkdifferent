@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Link Different
+ * Plugin Name: Link Different -- Delightful Hover Effects
  * Description: Transform your ordinary WordPress links into irresistible eye candy with Link Different. Add delightful hover effects to paragraph links that make visitors actually want to click them.
- * Version: 1.0.1
+ * Version: 1.0.0
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: Nick Hamze

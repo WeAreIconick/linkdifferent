@@ -1,4 +1,4 @@
-Link Different
+Link Different -- Delightful Hover Effects
 
 Contributors: iconick  
 Tags: links, fun, hover-effects, block-editor, animations  
