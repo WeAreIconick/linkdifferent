@@ -13,6 +13,8 @@ Links are meant to be clicked. No one wants to click on something boring.
 
 Transform your ordinary WordPress links into irresistible eye candy** with Link Different. Add delightful hover effects to paragraph links that make visitors actually want to click them.
 
+https://www.youtube.com/watch?v=5lhC6V5i2eM&feature=youtu.be
+
 Features
 
 - 5 unique animated hover effects that bring links to life
